@@ -78,3 +78,25 @@ export async function getMealHistory() {
   if (!res.ok) throw new Error(json.error || 'Failed to fetch history');
   return json;
 }
+
+export async function getExercisePlan() {
+  const res = await fetch(`${API}/exercise-plan`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify({}),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Failed to generate exercise plan');
+  return json;
+}
+
+export async function getDietaryPlan() {
+  const res = await fetch(`${API}/dietary-plan`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify({}),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Failed to generate dietary plan');
+  return json;
+}

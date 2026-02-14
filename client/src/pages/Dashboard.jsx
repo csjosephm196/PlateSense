@@ -37,7 +37,7 @@ export default function Dashboard() {
   }, [sessionId]);
 
   useEffect(() => {
-    getMealHistory().then(setMealHistory).catch(() => {});
+    getMealHistory().then(setMealHistory).catch(() => { });
   }, [analysis]);
 
   async function handleAnalyze() {
@@ -54,13 +54,13 @@ export default function Dashboard() {
     }
   }
 
-  const todayCarbs = mealHistory
-    .filter((m) => new Date(m.timestamp).toDateString() === new Date().toDateString())
-    .reduce((sum, m) => sum + (m.total_carbs || 0), 0);
-
-  const todayMeals = mealHistory.filter(
+  const todayMealsArr = mealHistory.filter(
     (m) => new Date(m.timestamp).toDateString() === new Date().toDateString()
-  ).length;
+  );
+
+  const todayCarbs = todayMealsArr.reduce((sum, m) => sum + (m.total_carbs || 0), 0);
+  const todayCalories = todayMealsArr.reduce((sum, m) => sum + (m.total_calories || 0), 0);
+  const todayMeals = todayMealsArr.length;
 
   const lastRisk = mealHistory[0]?.risk_level || '—';
 
@@ -73,6 +73,8 @@ export default function Dashboard() {
             <Link to="/dashboard" className="text-xl font-bold text-gray-900 tracking-tight">
               plate<span className="text-brand-purple">sense</span>
             </Link>
+            <Link to="/exercise-plan" className="text-sm text-gray-500 hover:text-brand-purple font-medium transition-colors">Exercise Plan</Link>
+            <Link to="/dietary-plan" className="text-sm text-gray-500 hover:text-brand-purple font-medium transition-colors">Dietary Plan</Link>
             <Link to="/profile" className="text-sm text-gray-500 hover:text-brand-purple font-medium transition-colors">Profile</Link>
           </div>
           <div className="flex items-center gap-4">
@@ -107,7 +109,7 @@ export default function Dashboard() {
         </div>
 
         {/* Quick stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-8 h-8 rounded-lg bg-brand-purple/10 flex items-center justify-center">
@@ -116,6 +118,15 @@ export default function Dashboard() {
               <span className="text-xs text-gray-400 font-medium">Today's Carbs</span>
             </div>
             <p className="text-2xl font-bold text-gray-900">{todayCarbs}<span className="text-sm font-normal text-gray-400 ml-1">g</span></p>
+          </div>
+          <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center">
+                <svg className="w-4 h-4 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" /></svg>
+              </div>
+              <span className="text-xs text-gray-400 font-medium">Today's Calories</span>
+            </div>
+            <p className="text-2xl font-bold text-gray-900">{todayCalories}<span className="text-sm font-normal text-gray-400 ml-1">kcal</span></p>
           </div>
           <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
             <div className="flex items-center gap-2 mb-2">
@@ -247,13 +258,13 @@ export default function Dashboard() {
                     </p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="text-sm font-semibold text-gray-900">{m.total_carbs}g</p>
-                    <span className={`inline-block mt-0.5 text-xs px-2 py-0.5 rounded-full font-medium ${
-                      m.risk_level?.toLowerCase() === 'low' ? 'bg-emerald-50 text-emerald-700' :
-                      m.risk_level?.toLowerCase() === 'moderate' ? 'bg-amber-50 text-amber-700' :
-                      m.risk_level?.toLowerCase() === 'high' ? 'bg-red-50 text-red-700' :
-                      'bg-gray-50 text-gray-500'
-                    }`}>
+                    <p className="text-sm font-semibold text-gray-900">{m.total_carbs}g carbs</p>
+                    <p className="text-xs text-gray-500">{m.total_calories || 0} kcal</p>
+                    <span className={`inline-block mt-0.5 text-xs px-2 py-0.5 rounded-full font-medium ${m.risk_level?.toLowerCase() === 'low' ? 'bg-emerald-50 text-emerald-700' :
+                        m.risk_level?.toLowerCase() === 'moderate' ? 'bg-amber-50 text-amber-700' :
+                          m.risk_level?.toLowerCase() === 'high' ? 'bg-red-50 text-red-700' :
+                            'bg-gray-50 text-gray-500'
+                      }`}>
                       {m.risk_level || '—'}
                     </span>
                   </div>

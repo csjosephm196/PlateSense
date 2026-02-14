@@ -13,6 +13,7 @@ export default function Register() {
     weight_kg: '',
     age: '',
     gender: '',
+    dietary_restriction: 'None',
   });
   const [error, setError] = useState('');
   const { login: setAuth } = useAuth();
@@ -113,6 +114,17 @@ export default function Register() {
               <option value="Other">Other</option>
             </select>
           </div>
+          <select
+            value={form.dietary_restriction}
+            onChange={(e) => update({ dietary_restriction: e.target.value })}
+            className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple outline-none transition"
+          >
+            <option value="None">No dietary restriction</option>
+            <option value="Vegan">Vegan</option>
+            <option value="Vegetarian">Vegetarian</option>
+            <option value="Halal">Halal</option>
+            <option value="Kosher">Kosher</option>
+          </select>
           {error && <p className="text-red-600 text-sm">{error}</p>}
           <button type="submit" className="w-full py-3 bg-brand-purple text-white rounded-xl font-medium hover:bg-brand-purple-dark transition-colors">
             Register

@@ -37,10 +37,12 @@ export async function analyzeFoodImage(imagePath) {
       "name": "Food name",
       "estimated_portion": "e.g. 1 cup",
       "estimated_carbs_g": number,
+      "estimated_calories": number,
       "confidence": 0.0-1.0
     }
   ],
-  "total_estimated_carbs_g": number
+  "total_estimated_carbs_g": number,
+  "total_estimated_calories": number
 }`;
 
   const messages = [
@@ -73,6 +75,127 @@ Predict glucose impact. Return ONLY valid JSON, no markdown or extra text:
     { role: 'user', content: prompt },
   ];
 
+  const json = await callOpenRouter(messages);
+  return JSON.parse(json);
+}
+
+export async function generateExercisePlan(params) {
+  const prompt = `Create a personalized weekly exercise plan for a person with the following profile:
+- Height: ${params.height_cm} cm
+- Weight: ${params.weight_kg} kg
+- Age: ${params.age}
+- Gender: ${params.gender}
+- Diabetes type: ${params.diabetes_type}
+
+Design an appropriate exercise plan considering their BMI and fitness level. Include a mix of cardio, strength training, and flexibility exercises. The plan should be safe for someone managing diabetes.
+
+Return ONLY valid JSON, no markdown or extra text:
+{
+  "bmi": number,
+  "fitness_assessment": "string describing their current estimated fitness level",
+  "weekly_plan": [
+    {
+      "day": "Monday",
+      "focus": "e.g. Cardio & Core",
+      "exercises": [
+        {
+          "name": "Exercise name",
+          "duration_minutes": number,
+          "sets": number or null,
+          "reps": number or null,
+          "intensity": "Low|Moderate|High",
+          "calories_burned_estimate": number,
+          "instructions": "Brief how-to"
+        }
+      ],
+      "total_duration_minutes": number,
+      "total_calories_burned": number
+    }
+  ],
+  "weekly_summary": {
+    "total_workout_days": number,
+    "rest_days": number,
+    "estimated_weekly_calories_burned": number
+  },
+  "safety_notes": ["string"],
+  "progression_tips": ["string"]
+}`;
+
+  const messages = [{ role: 'user', content: prompt }];
+  const json = await callOpenRouter(messages);
+  return JSON.parse(json);
+}
+
+export async function generateDietaryPlan(params) {
+  const prompt = `Create a personalized weekly dietary/meal plan for a person with the following profile:
+- Height: ${params.height_cm} cm
+- Weight: ${params.weight_kg} kg
+- Age: ${params.age}
+- Gender: ${params.gender}
+- Diabetes type: ${params.diabetes_type}
+- Dietary restriction: ${params.dietary_restriction}
+
+Follow FDA dietary guidelines (2020-2025 Dietary Guidelines for Americans). The meal plan must strictly adhere to the "${params.dietary_restriction}" dietary restriction. Include appropriate calorie and carbohydrate targets for someone managing diabetes.
+
+Return ONLY valid JSON, no markdown or extra text:
+{
+  "daily_calorie_target": number,
+  "daily_carb_target_g": number,
+  "dietary_restriction": "${params.dietary_restriction}",
+  "weekly_plan": [
+    {
+      "day": "Monday",
+      "meals": {
+        "breakfast": {
+          "name": "Meal name",
+          "description": "Brief description",
+          "foods": ["food item 1", "food item 2"],
+          "calories": number,
+          "carbs_g": number,
+          "protein_g": number,
+          "fat_g": number
+        },
+        "lunch": {
+          "name": "Meal name",
+          "description": "Brief description",
+          "foods": ["food item 1", "food item 2"],
+          "calories": number,
+          "carbs_g": number,
+          "protein_g": number,
+          "fat_g": number
+        },
+        "dinner": {
+          "name": "Meal name",
+          "description": "Brief description",
+          "foods": ["food item 1", "food item 2"],
+          "calories": number,
+          "carbs_g": number,
+          "protein_g": number,
+          "fat_g": number
+        },
+        "snacks": {
+          "name": "Snack ideas",
+          "description": "Brief description",
+          "foods": ["snack item 1", "snack item 2"],
+          "calories": number,
+          "carbs_g": number,
+          "protein_g": number,
+          "fat_g": number
+        }
+      },
+      "daily_totals": {
+        "calories": number,
+        "carbs_g": number,
+        "protein_g": number,
+        "fat_g": number
+      }
+    }
+  ],
+  "fda_guidelines_notes": ["string"],
+  "diabetes_specific_tips": ["string"]
+}`;
+
+  const messages = [{ role: 'user', content: prompt }];
   const json = await callOpenRouter(messages);
   return JSON.parse(json);
 }

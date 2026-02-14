@@ -61,6 +61,7 @@ router.post('/analyze-meal', authMiddleware, async (req, res) => {
       image_url: imageUrl,
       foods_detected: stage1.foods_detected || [],
       total_carbs: stage1.total_estimated_carbs_g || 0,
+      total_calories: stage1.total_estimated_calories || 0,
       predicted_spike: stage2.predicted_glucose_spike_mmol_L,
       risk_level: stage2.risk_level,
     });

@@ -13,6 +13,7 @@ export default function Profile() {
     diabetes_type: 'Type 2',
     insulin_to_carb_ratio: 10,
     baseline_glucose_range: '4-7',
+    dietary_restriction: 'None',
   });
   const [saved, setSaved] = useState(false);
 
@@ -26,6 +27,7 @@ export default function Profile() {
         diabetes_type: u.diabetes_type ?? 'Type 2',
         insulin_to_carb_ratio: u.insulin_to_carb_ratio ?? 10,
         baseline_glucose_range: u.baseline_glucose_range ?? '4-7',
+        dietary_restriction: u.dietary_restriction ?? 'None',
       });
     });
   }, []);
@@ -45,7 +47,7 @@ export default function Profile() {
         age: form.age ? Number(form.age) : null,
       });
       setSaved(true);
-    } catch {}
+    } catch { }
   }
 
   return (
@@ -130,6 +132,20 @@ export default function Profile() {
                 <option value="Other">Other</option>
               </select>
             </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Dietary restriction</label>
+            <select
+              value={form.dietary_restriction}
+              onChange={(e) => update({ dietary_restriction: e.target.value })}
+              className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple outline-none transition"
+            >
+              <option value="None">None</option>
+              <option value="Vegan">Vegan</option>
+              <option value="Vegetarian">Vegetarian</option>
+              <option value="Halal">Halal</option>
+              <option value="Kosher">Kosher</option>
+            </select>
           </div>
           {saved && <p className="text-brand-purple text-sm font-medium">Profile saved.</p>}
           <button type="submit" className="w-full py-3 bg-brand-purple text-white rounded-xl font-medium hover:bg-brand-purple-dark transition-colors">

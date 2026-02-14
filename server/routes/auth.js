@@ -8,7 +8,7 @@ const router = Router();
 
 router.post('/register', async (req, res) => {
   try {
-    const { email, password, diabetes_type, insulin_to_carb_ratio, height_cm, weight_kg, age, gender } = req.body;
+    const { email, password, diabetes_type, insulin_to_carb_ratio, height_cm, weight_kg, age, gender, dietary_restriction } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
     const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ error: 'Email already registered' });
@@ -22,6 +22,7 @@ router.post('/register', async (req, res) => {
       weight_kg: weight_kg ?? null,
       age: age ?? null,
       gender: gender ?? null,
+      dietary_restriction: dietary_restriction || 'None',
     });
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
     res.status(201).json({ token, user: { id: user._id, email: user.email } });
@@ -57,12 +58,13 @@ router.get('/me', authMiddleware, (req, res) => {
     weight_kg: u.weight_kg,
     age: u.age,
     gender: u.gender,
+    dietary_restriction: u.dietary_restriction,
   });
 });
 
 router.put('/profile', authMiddleware, async (req, res) => {
   try {
-    const { height_cm, weight_kg, age, gender, diabetes_type, insulin_to_carb_ratio, baseline_glucose_range } = req.body;
+    const { height_cm, weight_kg, age, gender, diabetes_type, insulin_to_carb_ratio, baseline_glucose_range, dietary_restriction } = req.body;
     const user = await User.findByIdAndUpdate(
       req.user._id,
       {
@@ -73,6 +75,7 @@ router.put('/profile', authMiddleware, async (req, res) => {
         ...(diabetes_type != null && { diabetes_type }),
         ...(insulin_to_carb_ratio != null && { insulin_to_carb_ratio }),
         ...(baseline_glucose_range != null && { baseline_glucose_range }),
+        ...(dietary_restriction != null && { dietary_restriction }),
       },
       { new: true }
     );
@@ -87,6 +90,7 @@ router.put('/profile', authMiddleware, async (req, res) => {
       weight_kg: u.weight_kg,
       age: u.age,
       gender: u.gender,
+      dietary_restriction: u.dietary_restriction,
     });
   } catch (err) {
     res.status(500).json({ error: err.message });

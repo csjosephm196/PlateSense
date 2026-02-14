@@ -8,6 +8,8 @@ import { connectDB } from './config/db.js';
 import authRoutes from './routes/auth.js';
 import sessionRoutes from './routes/session.js';
 import mealRoutes from './routes/meal.js';
+import exerciseRoutes from './routes/exercise.js';
+import dietRoutes from './routes/diet.js';
 import { initSocket } from './services/socket.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -21,6 +23,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/auth', authRoutes);
 app.use('/api', sessionRoutes);
 app.use('/api', mealRoutes);
+app.use('/api', exerciseRoutes);
+app.use('/api', dietRoutes);
 
 app.get('/api/health', (_, res) => res.json({ ok: true }));
 

@@ -62,7 +62,8 @@ export default function MealResults({ analysis }) {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-semibold text-gray-900">{f.estimated_carbs_g}g</p>
+                  <p className="text-sm font-semibold text-gray-900">{f.estimated_carbs_g}g carbs</p>
+                  <p className="text-xs text-gray-500">{f.estimated_calories || 0} kcal</p>
                   <div className="flex items-center gap-1 justify-end mt-0.5">
                     <div className="w-12 h-1 bg-gray-100 rounded-full overflow-hidden">
                       <div className="h-full bg-brand-purple rounded-full" style={{ width: `${Math.min((f.confidence || 0) * 100, 100)}%` }} />
@@ -74,8 +75,14 @@ export default function MealResults({ analysis }) {
             ))}
           </div>
           <div className="px-5 py-3 bg-gray-50/50 flex justify-between items-center">
-            <span className="text-sm text-gray-500">Total carbohydrates</span>
-            <span className="text-lg font-bold text-gray-900">{stage1?.total_estimated_carbs_g ?? 0}g</span>
+            <span className="text-sm text-gray-500">Totals</span>
+            <div className="text-right">
+              <span className="text-lg font-bold text-gray-900">{stage1?.total_estimated_carbs_g ?? 0}g</span>
+              <span className="text-sm text-gray-400 ml-2">carbs</span>
+              <span className="text-sm text-gray-300 mx-2">·</span>
+              <span className="text-lg font-bold text-gray-900">{stage1?.total_estimated_calories ?? 0}</span>
+              <span className="text-sm text-gray-400 ml-1">kcal</span>
+            </div>
           </div>
         </div>
 

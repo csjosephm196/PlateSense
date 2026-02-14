@@ -6,6 +6,8 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import MobileUpload from './pages/MobileUpload';
+import ExercisePlan from './pages/ExercisePlan';
+import DietaryPlan from './pages/DietaryPlan';
 
 function ProtectedRoute({ children }) {
   const { token } = useAuth();
@@ -33,6 +35,22 @@ export default function App() {
         element={
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/exercise-plan"
+        element={
+          <ProtectedRoute>
+            <ExercisePlan />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dietary-plan"
+        element={
+          <ProtectedRoute>
+            <DietaryPlan />
           </ProtectedRoute>
         }
       />

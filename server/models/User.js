@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
   weight_kg: { type: Number },
   age: { type: Number },
   gender: { type: String },
+  dietary_restriction: { type: String, default: 'None' },
 }, { timestamps: true });
 
 export default mongoose.model('User', userSchema);
