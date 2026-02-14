@@ -10,6 +10,7 @@ import sessionRoutes from './routes/session.js';
 import mealRoutes from './routes/meal.js';
 import exerciseRoutes from './routes/exercise.js';
 import dietRoutes from './routes/diet.js';
+import brainRoutes from './routes/brain.js';
 import { initSocket } from './services/socket.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -25,6 +26,7 @@ app.use('/api', sessionRoutes);
 app.use('/api', mealRoutes);
 app.use('/api', exerciseRoutes);
 app.use('/api', dietRoutes);
+app.use('/api', brainRoutes);
 
 app.get('/api/health', (_, res) => res.json({ ok: true }));
 

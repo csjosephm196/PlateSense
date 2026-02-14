@@ -141,3 +141,12 @@ export async function updateDietaryPlan(data) {
   return json;
 }
 
+export async function getBrainHealthReport() {
+  const res = await fetch(`${API}/brain-health`, {
+    headers: headers(),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Failed to fetch brain health report');
+  return json;
+}
+

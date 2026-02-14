@@ -53,8 +53,13 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-slate-50">
       <nav className="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center">
-        <Link to="/dashboard" className="text-brand-purple font-semibold hover:text-brand-purple-dark">← Dashboard</Link>
-        <span className="text-slate-500 text-sm">{user?.email}</span>
+        <div className="flex gap-4">
+          <Link to="/dashboard" className="text-brand-purple font-semibold hover:text-brand-purple-dark text-sm">Dashboard</Link>
+          <Link to="/dietary-plan" className="text-slate-500 font-medium hover:text-brand-purple text-sm">Dietary</Link>
+          <Link to="/exercise-plan" className="text-slate-500 font-medium hover:text-brand-purple text-sm">Fitness</Link>
+          <Link to="/brain-health" className="text-slate-500 font-medium hover:text-brand-purple text-sm">Mind</Link>
+        </div>
+        <span className="text-slate-500 text-sm hidden sm:block">{user?.email}</span>
       </nav>
       <div className="max-w-xl mx-auto p-6">
         <h1 className="text-2xl font-bold text-slate-800 mb-6">Profile</h1>

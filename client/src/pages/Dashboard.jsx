@@ -75,6 +75,7 @@ export default function Dashboard() {
             </Link>
             <Link to="/exercise-plan" className="text-sm text-gray-500 hover:text-brand-purple font-medium transition-colors">Exercise Plan</Link>
             <Link to="/dietary-plan" className="text-sm text-gray-500 hover:text-brand-purple font-medium transition-colors">Dietary Plan</Link>
+            <Link to="/brain-health" className="text-sm text-gray-500 hover:text-brand-purple font-medium transition-colors">Brain Health</Link>
             <Link to="/profile" className="text-sm text-gray-500 hover:text-brand-purple font-medium transition-colors">Profile</Link>
           </div>
           <div className="flex items-center gap-4">
@@ -100,6 +101,19 @@ export default function Dashboard() {
             </h1>
             <p className="text-gray-500 text-sm mt-0.5">Here's your meal dashboard</p>
           </div>
+          <Link
+            to="/brain-health"
+            className="flex items-center gap-3 px-5 py-2.5 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 transition-all group overflow-hidden relative"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-brand-purple/20 to-transparent opacity-0 group-hover:opacity-100 transition-all" />
+            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+              <svg className="w-4 h-4 text-brand-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">New Feature</p>
+              <p className="text-sm font-bold">Mind-Body Explorer</p>
+            </div>
+          </Link>
           <p className="text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2 text-xs flex items-center gap-2">
             <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -261,9 +275,9 @@ export default function Dashboard() {
                     <p className="text-sm font-semibold text-gray-900">{m.total_carbs}g carbs</p>
                     <p className="text-xs text-gray-500">{m.total_calories || 0} kcal</p>
                     <span className={`inline-block mt-0.5 text-xs px-2 py-0.5 rounded-full font-medium ${m.risk_level?.toLowerCase() === 'low' ? 'bg-emerald-50 text-emerald-700' :
-                        m.risk_level?.toLowerCase() === 'moderate' ? 'bg-amber-50 text-amber-700' :
-                          m.risk_level?.toLowerCase() === 'high' ? 'bg-red-50 text-red-700' :
-                            'bg-gray-50 text-gray-500'
+                      m.risk_level?.toLowerCase() === 'moderate' ? 'bg-amber-50 text-amber-700' :
+                        m.risk_level?.toLowerCase() === 'high' ? 'bg-red-50 text-red-700' :
+                          'bg-gray-50 text-gray-500'
                       }`}>
                       {m.risk_level || '—'}
                     </span>

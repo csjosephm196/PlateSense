@@ -199,3 +199,68 @@ Return ONLY valid JSON, no markdown or extra text:
   const json = await callOpenRouter(messages);
   return JSON.parse(json);
 }
+
+export async function analyzeBrainHealth(params) {
+  const prompt = `Analyze the brain health impact of the following dietary data for a person with diabetes (${params.diabetes_type}):
+- Current Dietary Plan: ${JSON.stringify(params.dietary_plan)}
+- Recent Meals: ${JSON.stringify(params.recent_meals)}
+
+Provide a detailed analysis of how this diet affects major brain regions and overall mental/physical health. Consider neurotransmitters, inflammation, energy levels, and long-term cognitive health.
+
+Return ONLY valid JSON, no markdown or extra text:
+{
+  "overall_score": number (0-100),
+  "summary": "string",
+  "regions": {
+    "Prefrontal Cortex": {
+      "status": "Positive|Neutral|Negative",
+      "impact": "Description of how the diet affects focus, decision-making, and executive function.",
+      "score": number (0-100)
+    },
+    "Hippocampus": {
+      "status": "Positive|Neutral|Negative",
+      "impact": "Description of impact on memory and learning.",
+      "score": number (0-100)
+    },
+    "Amygdala": {
+      "status": "Positive|Neutral|Negative",
+      "impact": "Description of impact on mood and emotional regulation.",
+      "score": number (0-100)
+    },
+    "Occipital Lobe": {
+       "status": "Positive|Neutral|Negative",
+       "impact": "Description of impact on vision and sensory processing.",
+       "score": number (0-100)
+    },
+    "Temporal Lobe": {
+       "status": "Positive|Neutral|Negative",
+       "impact": "Description of impact on language and auditory processing.",
+       "score": number (0-100)
+    },
+    "Cerebellum": {
+       "status": "Positive|Neutral|Negative",
+       "impact": "Description of impact on coordination and motor control.",
+       "score": number (0-100)
+    }
+  },
+  "mental_metrics": {
+    "focus": number (0-100),
+    "mood": number (0-100),
+    "energy": number (0-100),
+    "clarity": number (0-100)
+  },
+  "food_insights": [
+    {
+      "food": "string",
+      "region_affected": "string",
+      "benefit": "string"
+    }
+  ],
+  "recommendations": ["string"]
+}`;
+
+  const messages = [{ role: 'user', content: prompt }];
+  const json = await callOpenRouter(messages);
+  return JSON.parse(json);
+}
+

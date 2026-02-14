@@ -100,6 +100,7 @@ export default function ExercisePlan() {
                         <Link to="/dashboard" className="text-sm text-gray-500 hover:text-brand-purple font-medium transition-colors">Dashboard</Link>
                         <Link to="/exercise-plan" className="text-sm text-brand-purple font-medium">Exercise Plan</Link>
                         <Link to="/dietary-plan" className="text-sm text-gray-500 hover:text-brand-purple font-medium transition-colors">Dietary Plan</Link>
+                        <Link to="/brain-health" className="text-sm text-gray-500 hover:text-brand-purple font-medium transition-colors">Brain Health</Link>
                         <Link to="/profile" className="text-sm text-gray-500 hover:text-brand-purple font-medium transition-colors">Profile</Link>
                     </div>
                     <span className="text-gray-500 text-sm hidden md:block">{user?.email}</span>

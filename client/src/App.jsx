@@ -8,6 +8,7 @@ import Profile from './pages/Profile';
 import MobileUpload from './pages/MobileUpload';
 import ExercisePlan from './pages/ExercisePlan';
 import DietaryPlan from './pages/DietaryPlan';
+import BrainHealth from './pages/BrainHealth';
 
 function ProtectedRoute({ children }) {
   const { token } = useAuth();
@@ -51,6 +52,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <DietaryPlan />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/brain-health"
+        element={
+          <ProtectedRoute>
+            <BrainHealth />
           </ProtectedRoute>
         }
       />
