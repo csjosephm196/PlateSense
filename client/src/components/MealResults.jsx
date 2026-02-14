@@ -10,7 +10,7 @@ function riskColor(level) {
 export default function MealResults({ analysis }) {
   if (analysis.error) {
     return (
-      <div className="bg-white p-6 rounded-xl shadow">
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
         <p className="text-red-600">{analysis.error}</p>
       </div>
     );
@@ -19,7 +19,7 @@ export default function MealResults({ analysis }) {
   const { stage1, stage2 } = analysis;
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow space-y-6">
+    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-6">
       <h2 className="text-lg font-semibold text-slate-800">Analysis results</h2>
 
       <div>

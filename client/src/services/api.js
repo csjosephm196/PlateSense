@@ -1,0 +1,80 @@
+const API = '/api';
+
+function getToken() {
+  return localStorage.getItem('token');
+}
+
+function headers(includeAuth = true) {
+  const h = { 'Content-Type': 'application/json' };
+  if (includeAuth) h.Authorization = `Bearer ${getToken()}`;
+  return h;
+}
+
+export async function register(data) {
+  const res = await fetch(`${API}/auth/register`, {
+    method: 'POST',
+    headers: headers(false),
+    body: JSON.stringify(data),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Registration failed');
+  return json;
+}
+
+export async function login(email, password) {
+  const res = await fetch(`${API}/auth/login`, {
+    method: 'POST',
+    headers: headers(false),
+    body: JSON.stringify({ email, password }),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Login failed');
+  return json;
+}
+
+export async function getMe() {
+  const res = await fetch(`${API}/auth/me`, { headers: headers() });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Failed to fetch user');
+  return json;
+}
+
+export async function updateProfile(data) {
+  const res = await fetch(`${API}/auth/profile`, {
+    method: 'PUT',
+    headers: headers(),
+    body: JSON.stringify(data),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Update failed');
+  return json;
+}
+
+export async function createUploadSession() {
+  const res = await fetch(`${API}/create-upload-session`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify({}),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Failed to create session');
+  return json;
+}
+
+export async function analyzeMeal(imageUrl, currentGlucose) {
+  const res = await fetch(`${API}/analyze-meal`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify({ imageUrl, current_glucose: currentGlucose }),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Analysis failed');
+  return json;
+}
+
+export async function getMealHistory() {
+  const res = await fetch(`${API}/meal-history`, { headers: headers() });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Failed to fetch history');
+  return json;
+}
