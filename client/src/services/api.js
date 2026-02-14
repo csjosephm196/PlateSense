@@ -81,6 +81,15 @@ export async function getMealHistory() {
 
 export async function getExercisePlan() {
   const res = await fetch(`${API}/exercise-plan`, {
+    headers: headers(),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Failed to fetch exercise plan');
+  return json;
+}
+
+export async function generateExercisePlan() {
+  const res = await fetch(`${API}/exercise-plan`, {
     method: 'POST',
     headers: headers(),
     body: JSON.stringify({}),
@@ -90,7 +99,27 @@ export async function getExercisePlan() {
   return json;
 }
 
+export async function updateExercisePlan(data) {
+  const res = await fetch(`${API}/exercise-plan`, {
+    method: 'PUT',
+    headers: headers(),
+    body: JSON.stringify(data),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Failed to update exercise plan');
+  return json;
+}
+
 export async function getDietaryPlan() {
+  const res = await fetch(`${API}/dietary-plan`, {
+    headers: headers(),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Failed to fetch dietary plan');
+  return json;
+}
+
+export async function generateDietaryPlan() {
   const res = await fetch(`${API}/dietary-plan`, {
     method: 'POST',
     headers: headers(),
@@ -100,3 +129,15 @@ export async function getDietaryPlan() {
   if (!res.ok) throw new Error(json.error || 'Failed to generate dietary plan');
   return json;
 }
+
+export async function updateDietaryPlan(data) {
+  const res = await fetch(`${API}/dietary-plan`, {
+    method: 'PUT',
+    headers: headers(),
+    body: JSON.stringify(data),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Failed to update dietary plan');
+  return json;
+}
+
