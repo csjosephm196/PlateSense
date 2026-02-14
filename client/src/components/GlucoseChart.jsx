@@ -23,8 +23,8 @@ export default function GlucoseChart({ meals }) {
       {
         label: 'Carbs (g)',
         data: carbsData,
-        borderColor: 'rgb(124, 58, 237)',
-        backgroundColor: 'rgba(124, 58, 237, 0.1)',
+        borderColor: 'rgb(16, 185, 129)',
+        backgroundColor: 'rgba(16, 185, 129, 0.1)',
         tension: 0.3,
       },
     ],

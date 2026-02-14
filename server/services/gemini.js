@@ -1,20 +1,35 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
+const MODEL = 'google/gemini-2.0-flash-lite-001';
 
-function fileToGenerativePart(path, mimeType) {
-  return {
-    inlineData: {
-      data: fs.readFileSync(path).toString('base64'),
-      mimeType: mimeType || 'image/jpeg',
+async function callOpenRouter(messages) {
+  const res = await fetch(OPENROUTER_URL, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      'Content-Type': 'application/json',
     },
-  };
+    body: JSON.stringify({
+      model: MODEL,
+      messages,
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`OpenRouter error ${res.status}: ${err}`);
+  }
+
+  const data = await res.json();
+  const text = data.choices?.[0]?.message?.content || '';
+  return text.replace(/```json\n?|\n?```/g, '').trim();
 }
 
 export async function analyzeFoodImage(imagePath) {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-  const imagePart = fileToGenerativePart(imagePath, 'image/jpeg');
+  const base64 = fs.readFileSync(imagePath).toString('base64');
+  const mimeType = imagePath.endsWith('.png') ? 'image/png' : 'image/jpeg';
+
   const prompt = `Analyze this meal image. Return ONLY valid JSON, no markdown or extra text:
 {
   "foods_detected": [
@@ -27,14 +42,22 @@ export async function analyzeFoodImage(imagePath) {
   ],
   "total_estimated_carbs_g": number
 }`;
-  const result = await model.generateContent([prompt, imagePart]);
-  const text = result.response.text();
-  const json = text.replace(/```json\n?|\n?```/g, '').trim();
+
+  const messages = [
+    {
+      role: 'user',
+      content: [
+        { type: 'text', text: prompt },
+        { type: 'image_url', image_url: { url: `data:${mimeType};base64,${base64}` } },
+      ],
+    },
+  ];
+
+  const json = await callOpenRouter(messages);
   return JSON.parse(json);
 }
 
 export async function predictGlucoseImpact(params) {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
   const prompt = `Given: total carbs ${params.total_carbs}g, diabetes type ${params.diabetes_type}, current glucose ${params.current_glucose} mmol/L, insulin-to-carb ratio ${params.insulin_to_carb_ratio}, height ${params.height_cm}cm, weight ${params.weight_kg}kg, age ${params.age}, gender ${params.gender}.
 Predict glucose impact. Return ONLY valid JSON, no markdown or extra text:
 {
@@ -45,8 +68,11 @@ Predict glucose impact. Return ONLY valid JSON, no markdown or extra text:
   "explanation": "string",
   "confidence_score": 0.0-1.0
 }`;
-  const result = await model.generateContent(prompt);
-  const text = result.response.text();
-  const json = text.replace(/```json\n?|\n?```/g, '').trim();
+
+  const messages = [
+    { role: 'user', content: prompt },
+  ];
+
+  const json = await callOpenRouter(messages);
   return JSON.parse(json);
 }

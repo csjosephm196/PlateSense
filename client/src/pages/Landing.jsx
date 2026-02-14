@@ -53,9 +53,9 @@ function ScreenDashboard() {
         <div className="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
           <p className="text-[9px] text-gray-400 mb-2">Weekly trend</p>
           <svg viewBox="0 0 200 60" className="w-full">
-            <polyline fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+            <polyline fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
               points="0,45 30,35 60,50 90,25 120,30 150,15 180,20 200,10" />
-            <polyline fill="rgba(124,58,237,0.08)" stroke="none"
+            <polyline fill="rgba(16,185,129,0.08)" stroke="none"
               points="0,60 0,45 30,35 60,50 90,25 120,30 150,15 180,20 200,10 200,60" />
           </svg>
           <div className="flex justify-between mt-1 text-[8px] text-gray-400">

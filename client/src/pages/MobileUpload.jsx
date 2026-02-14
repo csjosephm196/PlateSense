@@ -80,7 +80,7 @@ export default function MobileUpload() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-violet-50/30 flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-emerald-50/30 flex flex-col items-center justify-center p-6">
       <h1 className="text-2xl font-bold text-slate-900 mb-2">
         Plate<span className="text-brand-purple">Sense</span>
       </h1>
