@@ -89,5 +89,18 @@ export default function App() {
         }
       />
     </Routes>
+    <>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/upload/:sessionId" element={<MobileUpload />} />
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/exercise-plan" element={<ProtectedRoute><ExercisePlan /></ProtectedRoute>} />
+        <Route path="/dietary-plan" element={<ProtectedRoute><DietaryPlan /></ProtectedRoute>} />
+        <Route path="/brain-health" element={<ProtectedRoute><BrainHealth /></ProtectedRoute>} />
+      </Routes>
+    </>
   );
 }

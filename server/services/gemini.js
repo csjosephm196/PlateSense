@@ -207,39 +207,49 @@ export async function analyzeBrainHealth(params) {
 
 Provide a detailed analysis of how this diet affects major brain regions and overall mental/physical health. Consider neurotransmitters, inflammation, energy levels, and long-term cognitive health.
 
-Return ONLY valid JSON, no markdown or extra text:
+Return ONLY valid JSON, no markdown or extra text. Strict JSON rules: NO trailing commas.
 {
   "overall_score": number (0-100),
   "summary": "string",
   "regions": {
     "Prefrontal Cortex": {
       "status": "Positive|Neutral|Negative",
-      "impact": "Description of how the diet affects focus, decision-making, and executive function.",
+      "impact": "• Focus & Attention: Short sentence explaining why.\n• Personality Traits: Short sentence explaining why.\n• Decision Making: Short sentence explaining why.\n• Impulse Control: Short sentence explaining why.",
       "score": number (0-100)
     },
-    "Hippocampus": {
+    "Frontal Lobe": {
       "status": "Positive|Neutral|Negative",
-      "impact": "Description of impact on memory and learning.",
+      "impact": "• Problem Solving: Short sentence explanation.\n• Muscle Control: Short sentence explanation.\n• Social Skills: Short sentence explanation.\n• Speech Production: Short sentence explanation.",
       "score": number (0-100)
     },
-    "Amygdala": {
+    "Parietal Lobe": {
       "status": "Positive|Neutral|Negative",
-      "impact": "Description of impact on mood and emotional regulation.",
+      "impact": "• Sensory Perception: Short sentence explanation.\n• Spatial Awareness: Short sentence explanation.\n• Object Recognition: Short sentence explanation.\n• Hand-Eye Coord.: Short sentence explanation.",
       "score": number (0-100)
     },
     "Occipital Lobe": {
        "status": "Positive|Neutral|Negative",
-       "impact": "Description of impact on vision and sensory processing.",
+       "impact": "• Visual Processing: Short sentence explanation.\n• Depth Perception: Short sentence explanation.\n• Color Recognition: Short sentence explanation.\n• Motion Tracking: Short sentence explanation.",
        "score": number (0-100)
     },
     "Temporal Lobe": {
        "status": "Positive|Neutral|Negative",
-       "impact": "Description of impact on language and auditory processing.",
+       "impact": "• Memory Storage: Short sentence explanation.\n• Hearing & Audio: Short sentence explanation.\n• Language Logic: Short sentence explanation.\n• Face Recognition: Short sentence explanation.",
        "score": number (0-100)
     },
     "Cerebellum": {
        "status": "Positive|Neutral|Negative",
-       "impact": "Description of impact on coordination and motor control.",
+       "impact": "• Physical Balance: Short sentence explanation.\n• Coordination: Short sentence explanation.\n• Fine Motor Skills: Short sentence explanation.\n• Posture Control: Short sentence explanation.",
+       "score": number (0-100)
+    },
+    "Amygdala": {
+       "status": "Positive|Neutral|Negative",
+       "impact": "• Emotional Processing: Short sentence explanation.\n• Fear Response: Short sentence explanation.\n• Anxiety Regulation: Short sentence explanation.\n• Survival Instincts: Short sentence explanation.",
+       "score": number (0-100)
+    },
+    "Hippocampus": {
+       "status": "Positive|Neutral|Negative",
+       "impact": "• Long-term Memory: Short sentence explanation.\n• Spatial Navigation: Short sentence explanation.\n• Learning Capacity: Short sentence explanation.\n• Emotional Context: Short sentence explanation.",
        "score": number (0-100)
     }
   },
@@ -252,7 +262,7 @@ Return ONLY valid JSON, no markdown or extra text:
   "food_insights": [
     {
       "food": "string",
-      "region_affected": "string",
+      "region_affected": "string (Must match one of the region keys above)",
       "benefit": "string"
     }
   ],
