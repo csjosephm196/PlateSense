@@ -274,3 +274,25 @@ Return ONLY valid JSON, no markdown or extra text. Strict JSON rules: NO trailin
   return JSON.parse(json);
 }
 
+export async function generateRepairMeal(params) {
+  const prompt = `Suggest 3 specific food items that are best for repairing/improving the "${params.region}" (Status: ${params.status}).
+
+For each food, list the specific vitamins/nutrients it contains that help this brain region.
+
+Return ONLY valid JSON, no markdown. Strict JSON rules: NO trailing commas.
+{
+  "title": "Brain-Boosting Foods",
+  "foods": [
+    {
+      "name": "Food Name (e.g. Walnuts)",
+      "nutrients": "Key Vitamins/Nutrients (e.g. Omega-3, Vitamin E)",
+      "benefit": "Short reason why it helps"
+    }
+  ]
+}`;
+
+  const messages = [{ role: 'user', content: prompt }];
+  const json = await callOpenRouter(messages);
+  return JSON.parse(json);
+}
+

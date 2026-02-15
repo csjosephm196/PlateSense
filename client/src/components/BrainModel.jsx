@@ -107,7 +107,7 @@ const DATA_KEY_MAPPING = {
     'Parietal Lobe': 'Parietal Lobe'
 };
 
-export default function BrainModel({ data, onRegionSelect }) {
+export default function BrainModel({ data, onRegionSelect, selectedRegion }) {
     const [hoveredRegion, setHoveredRegion] = useState(null);
 
     const regionStatus = useMemo(() => {
@@ -130,19 +130,6 @@ export default function BrainModel({ data, onRegionSelect }) {
 
         return status;
     }, [data]);
-
-    const handleMouseEnter = (regionName) => {
-        setHoveredRegion(regionName);
-        if (onRegionSelect) {
-            const status = regionStatus[regionName];
-            onRegionSelect(status ? status.originalKey : regionName);
-        }
-    };
-
-    const handleMouseLeave = () => {
-        setHoveredRegion(null);
-        if (onRegionSelect) onRegionSelect(null);
-    };
 
     return (
         <div className="w-full h-[400px] bg-slate-900 rounded-3xl overflow-hidden relative border border-slate-800 shadow-2xl flex items-center justify-center bg-grid-slate-800/[0.2]">
@@ -167,6 +154,7 @@ export default function BrainModel({ data, onRegionSelect }) {
                         .map(([name, pathData]) => {
                             const regionInfo = regionStatus[name];
                             const isHovered = hoveredRegion === name;
+                            const isSelected = selectedRegion === name;
                             const isInternal = pathData.internal;
 
                             // Determine color based on score
@@ -178,27 +166,30 @@ export default function BrainModel({ data, onRegionSelect }) {
                             }
 
                             let fillColor = healthColor;
+                            // visual feedback for hover AND selection
                             if (isHovered) fillColor = '#cbd5e1'; // Slate-300 on hover
+                            if (isSelected && !isHovered) fillColor = '#e2e8f0'; // Slate-200 if selected but not hovered (to keep it distinct)
 
                             // Internal structures (Amygdala/Hippocampus) styling
                             let opacity = 1;
                             let strokeColor = '#000000'; // Always black boundaries
-                            let strokeWidth = isHovered ? 3 : 1.5;
+                            let strokeWidth = (isHovered || isSelected) ? 3 : 1.5;
 
                             if (isInternal) {
                                 opacity = 0.9;
-                                strokeColor = '#000000'; // Even internal ones get black stroke for definition
-                                strokeWidth = isHovered ? 3 : 1.5;
+                                strokeColor = '#000000';
+                                strokeWidth = (isHovered || isSelected) ? 3 : 1.5;
                             }
 
                             return (
                                 <g key={name}
                                     className="transition-all duration-300 ease-out cursor-pointer group"
-                                    onMouseEnter={() => handleMouseEnter(name)}
-                                    onMouseLeave={handleMouseLeave}
+                                    onMouseEnter={() => setHoveredRegion(name)}
+                                    onMouseLeave={() => setHoveredRegion(null)}
+                                    onClick={() => onRegionSelect && onRegionSelect(name)}
                                     style={{
                                         transformOrigin: 'center',
-                                        transform: isHovered ? 'scale(1.02)' : 'scale(1)'
+                                        transform: (isHovered || isSelected) ? 'scale(1.02)' : 'scale(1)'
                                     }}
                                 >
                                     {/* Base Shape */}
@@ -211,7 +202,7 @@ export default function BrainModel({ data, onRegionSelect }) {
                                         strokeLinejoin="round"
                                         fillOpacity={opacity}
                                         style={{
-                                            filter: isHovered ? 'url(#glow)' : 'none',
+                                            filter: (isHovered || isSelected) ? 'url(#glow)' : 'none',
                                         }}
                                     />
 
