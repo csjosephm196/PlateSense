@@ -5,10 +5,6 @@ import { getBrainHealthReport } from '../services/api';
 import ErrorBoundary from '../components/ErrorBoundary';
 
 const BrainModel = lazy(() => import('../components/BrainModel'));
-// import BrainModel from '../components/BrainModel';
-import ErrorBoundary from '../components/ErrorBoundary';
-
-const BrainModel = lazy(() => import('../components/BrainModel'));
 
 const STATIC_REGION_INFO = {
     'Prefrontal Cortex': {
@@ -199,8 +195,6 @@ export default function BrainHealth() {
                                     </div>
                                 </div>
                             }>
-                        <ErrorBoundary>
-                            <Suspense fallback={<div className="text-white p-10 border border-slate-800 rounded-3xl text-center">Loading 3D Model...</div>}>
                                 <BrainModel
                                     data={report}
                                     onRegionSelect={setSelectedRegion}
