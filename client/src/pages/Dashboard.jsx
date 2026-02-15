@@ -26,7 +26,7 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    refreshSession();
+    refreshSession().catch(err => console.error('Session refresh failed:', err));
   }, [refreshSession]);
 
   useEffect(() => {

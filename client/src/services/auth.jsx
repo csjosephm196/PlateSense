@@ -11,9 +11,17 @@ export function AuthProvider({ children }) {
       fetch('/api/auth/me', {
         headers: { Authorization: `Bearer ${token}` },
       })
-        .then((r) => (r.ok ? r.json() : null))
+        .then((r) => {
+          if (r.ok) return r.json();
+          setToken(null);
+          localStorage.removeItem('token');
+          return null;
+        })
         .then(setUser)
-        .catch(() => setToken(null));
+        .catch(() => {
+          setToken(null);
+          localStorage.removeItem('token');
+        });
     } else {
       setUser(null);
     }
