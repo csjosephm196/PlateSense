@@ -228,22 +228,25 @@ export default function BrainModel({ data, onRegionSelect, selectedRegion }) {
                 <p className="text-slate-400 text-xs uppercase tracking-widest font-semibold mt-1">Anatomical Lateral View</p>
             </div>
 
-            {hoveredRegion && (
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-md border border-slate-700 px-5 py-3 rounded-2xl pointer-events-none animate-in fade-in slide-in-from-bottom-2 z-20 min-w-[200px] text-center shadow-2xl">
-                    <span className="text-white font-bold text-sm block tracking-wide">{hoveredRegion}</span>
-                    <span className="text-slate-400 text-[10px] uppercase tracking-widest block mb-1.5">{ORGANIC_PATHS[hoveredRegion].description}</span>
-                    {regionStatus[hoveredRegion] ? (
-                        <div className="inline-flex items-center justify-center gap-2">
-                            <div className={`w-2 h-2 rounded-full ${regionStatus[hoveredRegion].score > 70 ? 'bg-emerald-400' : 'bg-red-400'}`} />
-                            <span className={`text-xs font-black ${regionStatus[hoveredRegion].score > 70 ? 'text-emerald-300' : 'text-red-300'}`}>
-                                Score: {regionStatus[hoveredRegion].score}
-                            </span>
-                        </div>
-                    ) : (
-                        <span className="text-xs text-slate-500 italic">No active data</span>
-                    )}
-                </div>
-            )}
+            {(hoveredRegion || selectedRegion) && (() => {
+                const activeDisplayRegion = hoveredRegion || selectedRegion;
+                return (
+                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-md border border-slate-700 px-5 py-3 rounded-2xl pointer-events-none animate-in fade-in slide-in-from-bottom-2 z-20 min-w-[200px] text-center shadow-2xl">
+                        <span className="text-white font-bold text-sm block tracking-wide">{activeDisplayRegion}</span>
+                        <span className="text-slate-400 text-[10px] uppercase tracking-widest block mb-1.5">{ORGANIC_PATHS[activeDisplayRegion].description}</span>
+                        {regionStatus[activeDisplayRegion] ? (
+                            <div className="inline-flex items-center justify-center gap-2">
+                                <div className={`w-2 h-2 rounded-full ${regionStatus[activeDisplayRegion].score > 70 ? 'bg-emerald-400' : 'bg-red-400'}`} />
+                                <span className={`text-xs font-black ${regionStatus[activeDisplayRegion].score > 70 ? 'text-emerald-300' : 'text-red-300'}`}>
+                                    Score: {regionStatus[activeDisplayRegion].score}
+                                </span>
+                            </div>
+                        ) : (
+                            <span className="text-xs text-slate-500 italic">No active data</span>
+                        )}
+                    </div>
+                );
+            })()}
         </div>
     );
 }

@@ -275,18 +275,24 @@ Return ONLY valid JSON, no markdown or extra text. Strict JSON rules: NO trailin
 }
 
 export async function generateRepairMeal(params) {
-  const prompt = `Suggest 3 specific food items that are best for repairing/improving the "${params.region}" (Status: ${params.status}).
+  const prompt = `Suggest 3 distinct food items that are scientifically linked to the unique functions of the "${params.region}" (Status: ${params.status}).
 
-For each food, list the specific vitamins/nutrients it contains that help this brain region.
+CRITICAL: Do NOT provide generic brain advice. The foods must be specific to the anatomy:
+- If Region is Occipital Lobe -> Focus on Lutein/Zeaxanthin (Vision).
+- If Region is Hippocampus -> Focus on BDNF boosters/Memory.
+- If Region is Prefrontal Cortex -> Focus on Dopamine/Focus.
+- If Region is Cerebellum -> Focus on Motor control/Coordination.
+
+For each food, list the specific bio-compound that helps *this specific region*.
 
 Return ONLY valid JSON, no markdown. Strict JSON rules: NO trailing commas.
 {
-  "title": "Brain-Boosting Foods",
+  "title": "Region-Specific Fuel",
   "foods": [
     {
-      "name": "Food Name (e.g. Walnuts)",
-      "nutrients": "Key Vitamins/Nutrients (e.g. Omega-3, Vitamin E)",
-      "benefit": "Short reason why it helps"
+      "name": "Food Name",
+      "nutrients": "Specific Bio-compound",
+      "benefit": "Mechanism of action for this region"
     }
   ]
 }`;

@@ -193,8 +193,8 @@ function ScreenQR() {
       <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 mx-5">
         <svg viewBox="0 0 100 100" className="w-32 h-32">
           {/* QR code pattern */}
-          {[0,1,2,3,4,5,6].map((row) =>
-            [0,1,2,3,4,5,6].map((col) => {
+          {[0, 1, 2, 3, 4, 5, 6].map((row) =>
+            [0, 1, 2, 3, 4, 5, 6].map((col) => {
               const isCorner = (row < 3 && col < 3) || (row < 3 && col > 3) || (row > 3 && col < 3);
               const show = isCorner || Math.random() > 0.4;
               return show ? (
@@ -230,8 +230,9 @@ export default function Landing() {
       {/* Fixed header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200/60">
         <nav className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-          <Link to="/" className="text-lg font-bold text-gray-900 tracking-tight">
-            plate<span className="text-brand-purple">sense</span>
+          <Link to="/" className="text-lg font-bold text-gray-900 tracking-tight flex items-center gap-2">
+            <img src="/src/assets/platesenselogo.png" alt="PlateSense Logo" className="h-8" />
+            <span>plate<span className="text-brand-purple">sense</span></span>
           </Link>
           <div className="flex items-center gap-5">
             <Link to="/register" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">

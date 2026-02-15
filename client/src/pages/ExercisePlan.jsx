@@ -94,8 +94,9 @@ export default function ExercisePlan() {
             <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200/60 sticky top-0 z-40 px-6 py-3">
                 <div className="max-w-6xl mx-auto flex justify-between items-center">
                     <div className="flex gap-6 items-center">
-                        <Link to="/dashboard" className="text-xl font-bold text-gray-900 tracking-tight">
-                            plate<span className="text-brand-purple">sense</span>
+                        <Link to="/dashboard" className="text-xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
+                            <img src="/src/assets/platesenselogo.png" alt="PlateSense Logo" className="h-8" />
+                            <span>plate<span className="text-brand-purple">sense</span></span>
                         </Link>
                         <Link to="/dashboard" className="text-sm text-gray-500 hover:text-brand-purple font-medium transition-colors">Dashboard</Link>
                         <Link to="/exercise-plan" className="text-sm text-brand-purple font-medium">Exercise Plan</Link>

@@ -142,8 +142,9 @@ export default function BrainHealth() {
             <nav className="bg-slate-900/50 backdrop-blur-xl border-b border-slate-800 sticky top-0 z-50 px-6 py-3">
                 <div className="max-w-7xl mx-auto flex justify-between items-center">
                     <div className="flex gap-8 items-center">
-                        <Link to="/dashboard" className="text-xl font-black text-white tracking-tighter">
-                            plate<span className="text-brand-purple">sense</span>
+                        <Link to="/dashboard" className="text-xl font-black text-white tracking-tighter flex items-center gap-2">
+                            <img src="/src/assets/platesenselogo.png" alt="PlateSense Logo" className="h-8" />
+                            <span>plate<span className="text-brand-purple">sense</span></span>
                         </Link>
                         <div className="hidden md:flex gap-6">
                             <Link to="/dashboard" className="text-xs font-bold text-slate-500 hover:text-white transition-all uppercase tracking-widest">Dashboard</Link>
