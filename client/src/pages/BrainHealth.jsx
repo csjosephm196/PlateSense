@@ -2,6 +2,9 @@ import { useState, useEffect, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../services/auth';
 import { getBrainHealthReport } from '../services/api';
+import ErrorBoundary from '../components/ErrorBoundary';
+
+const BrainModel = lazy(() => import('../components/BrainModel'));
 // import BrainModel from '../components/BrainModel';
 import ErrorBoundary from '../components/ErrorBoundary';
 
@@ -180,6 +183,22 @@ export default function BrainHealth() {
                     {/* Left: 3D Model Explorer */}
 
                     <div className="lg:col-span-7 space-y-6">
+                        <ErrorBoundary fallback={
+                            <div className="w-full h-[400px] bg-slate-900 rounded-3xl flex items-center justify-center border border-slate-800">
+                                <div className="text-center">
+                                    <p className="text-slate-400 font-medium">3D visualization unavailable</p>
+                                    <p className="text-slate-600 text-sm mt-1">Select a region from the list below</p>
+                                </div>
+                            </div>
+                        }>
+                            <Suspense fallback={
+                                <div className="w-full h-[400px] bg-slate-900 rounded-3xl flex items-center justify-center border border-slate-800">
+                                    <div className="text-center">
+                                        <svg className="animate-spin w-8 h-8 text-brand-purple mx-auto mb-3" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                                        <p className="text-slate-500 text-sm">Loading 3D model...</p>
+                                    </div>
+                                </div>
+                            }>
                         <ErrorBoundary>
                             <Suspense fallback={<div className="text-white p-10 border border-slate-800 rounded-3xl text-center">Loading 3D Model...</div>}>
                                 <BrainModel
@@ -188,6 +207,24 @@ export default function BrainHealth() {
                                 />
                             </Suspense>
                         </ErrorBoundary>
+
+                        {/* Region Selector (works even if 3D fails) */}
+                        {report?.regions && (
+                            <div className="flex flex-wrap gap-2">
+                                {Object.entries(report.regions).map(([name, data]) => (
+                                    <button
+                                        key={name}
+                                        onClick={() => setSelectedRegion(selectedRegion === name ? null : name)}
+                                        className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all border ${selectedRegion === name
+                                            ? 'bg-brand-purple text-white border-brand-purple'
+                                            : 'bg-slate-800/50 text-slate-400 border-slate-700 hover:border-slate-500 hover:text-white'
+                                        }`}
+                                    >
+                                        {name} &middot; {data.score}%
+                                    </button>
+                                ))}
+                            </div>
+                        )}
 
                         {/* Cognitive Metrics Grid */}
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
