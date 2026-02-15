@@ -1,8 +1,78 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../services/auth';
 import { getBrainHealthReport } from '../services/api';
-import BrainModel from '../components/BrainModel';
+// import BrainModel from '../components/BrainModel';
+import ErrorBoundary from '../components/ErrorBoundary';
+
+const BrainModel = lazy(() => import('../components/BrainModel'));
+
+const STATIC_REGION_INFO = {
+    'Prefrontal Cortex': {
+        score: 85, status: 'Positive',
+        impact: "• Focus & Attention: Vital for sustaining concentration on tasks.\n• Personality Traits: Shapes your unique character and social behavior.\n• Decision Making: Powers logical reasoning and choices.\n• Impulse Control: Helps regulate immediate reactions.",
+        food_insights: [
+            { food: "Walnuts", benefit: "High in DHA for executive function" },
+            { food: "Blueberries", benefit: "Antioxidants reduce cognitive decline" }
+        ]
+    },
+    'Frontal Lobe': {
+        score: 80, status: 'Neutral',
+        impact: "• Problem Solving: Enables finding solutions to complex issues.\n• Muscle Control: Coordinates voluntary body movements.\n• Social Skills: Governs interactions and empathy.\n• Speech Production: Essential for fluent verbal communication.",
+        food_insights: [
+            { food: "Broccoli", benefit: "Vitamin K enhances cognitive function" },
+            { food: "Pumpkin Seeds", benefit: "Zinc for nerve signaling" }
+        ]
+    },
+    'Parietal Lobe': {
+        score: 75, status: 'Neutral',
+        impact: "• Sensory Perception: Processes touch, temperature, and pain.\n• Spatial Awareness: key for navigation and physical orientation.\n• Object Recognition: Identifies shapes and textures instantly.\n• Hand-Eye Coord.: Critical for precise motor tasks.",
+        food_insights: [
+            { food: "Eggs", benefit: "Choline supports sensory integration" },
+            { food: "Oranges", benefit: "Vitamin C prevents mental decline" }
+        ]
+    },
+    'Occipital Lobe': {
+        score: 82, status: 'Positive',
+        impact: "• Visual Processing: Decodes visual signals from the eyes.\n• Depth Perception: Allows judging distances accurately.\n• Color Recognition: Distinguishes hues and shades.\n• Motion Tracking: Follows moving objects smoothly.",
+        food_insights: [
+            { food: "Spinach", benefit: "Lutein protects brain cells" },
+            { food: "Carrots", benefit: "Beta-carotene for visual acuity" }
+        ]
+    },
+    'Temporal Lobe': {
+        score: 84, status: 'Positive',
+        impact: "• Memory Storage: Archives long-term personal experiences.\n• Hearing & Audio: Processes sounds and spoken language.\n• Language Logic: Helps understand structure and meaning.\n• Face Recognition: Identifies familiar people instantly.",
+        food_insights: [
+            { food: "Salmon", benefit: "Omega-3s support memory circuits" },
+            { food: "Turmeric", benefit: "Curcumin clears amyloid plaques" }
+        ]
+    },
+    'Cerebellum': {
+        score: 88, status: 'Positive',
+        impact: "• Physical Balance: Maintains stability while standing or moving.\n• Coordination: Synchronizes complex muscle actions.\n• Fine Motor Skills: Enables precise dexterity and control.\n• Posture Control: Supports upright body alignment.",
+        food_insights: [
+            { food: "Whole Grains", benefit: "Steady energy for motor control" },
+            { food: "Avocado", benefit: "Healthy fats for blood flow" }
+        ]
+    },
+    'Amygdala': {
+        score: 70, status: 'Neutral',
+        impact: "• Emotional Processing: Decodes feelings and social cues.\n• Fear Response: triggers reaction to perceived threats.\n• Anxiety Regulation: Manages stress and unease levels.\n• Survival Instincts: Drives fight-or-flight reactions.",
+        food_insights: [
+            { food: "Dark Chocolate", benefit: "Flavonoids improve mood regulation" },
+            { food: "Green Tea", benefit: "L-theanine reduces anxiety" }
+        ]
+    },
+    'Hippocampus': {
+        score: 86, status: 'Positive',
+        impact: "• Long-term Memory: Converts new info into lasting memories.\n• Spatial Navigation: Creates mental maps of environments.\n• Learning Capacity: Facilitates acquiring new knowledge.\n• Emotional Context: Links feelings to specific memories.",
+        food_insights: [
+            { food: "Rosemary", benefit: "Compounds improve memory retention" },
+            { food: "Olive Oil", benefit: "Polyphenols support learning" }
+        ]
+    }
+};
 
 export default function BrainHealth() {
     const { user } = useAuth();
@@ -15,13 +85,21 @@ export default function BrainHealth() {
         setLoading(true);
         getBrainHealthReport()
             .then(data => {
-                if (data && !data.error) setReport(data);
+                if (data) {
+                    if (data.error) {
+                        setErr(data.error);
+                    } else {
+                        setReport(data);
+                    }
+                } else {
+                    setErr('No data received from server');
+                }
             })
             .catch(e => setErr(e.message))
             .finally(() => setLoading(false));
     }, []);
 
-    const activeRegionData = selectedRegion ? report?.regions?.[selectedRegion] : null;
+    const activeRegionData = selectedRegion ? (report?.regions?.[selectedRegion] || STATIC_REGION_INFO[selectedRegion]) : null;
 
     if (loading) {
         return (
@@ -100,23 +178,45 @@ export default function BrainHealth() {
 
                 <div className="grid lg:grid-cols-12 gap-8 items-start">
                     {/* Left: 3D Model Explorer */}
+
                     <div className="lg:col-span-7 space-y-6">
-                        <BrainModel
-                            data={report}
-                            onRegionSelect={setSelectedRegion}
-                        />
+                        <ErrorBoundary>
+                            <Suspense fallback={<div className="text-white p-10 border border-slate-800 rounded-3xl text-center">Loading 3D Model...</div>}>
+                                <BrainModel
+                                    data={report}
+                                    onRegionSelect={setSelectedRegion}
+                                />
+                            </Suspense>
+                        </ErrorBoundary>
 
                         {/* Cognitive Metrics Grid */}
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                            {report?.mental_metrics && Object.entries(report.mental_metrics).map(([key, val]) => (
-                                <div key={key} className="bg-slate-900/40 border border-slate-800/60 p-5 rounded-3xl hover:bg-slate-900/60 transition-all group">
-                                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2 group-hover:text-slate-300 transition-colors">{key}</span>
-                                    <div className="flex items-end gap-1">
-                                        <span className="text-2xl font-black text-white leading-none">{val}</span>
-                                        <span className="text-[10px] text-slate-500 mb-0.5">/100</span>
+                            {report?.mental_metrics && Object.entries(report.mental_metrics).map(([key, val]) => {
+                                const styles = {
+                                    focus: { bg: 'bg-indigo-500/10', border: 'border-indigo-500/20', text: 'text-indigo-400' },
+                                    mood: { bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', text: 'text-emerald-400' },
+                                    energy: { bg: 'bg-amber-500/10', border: 'border-amber-500/20', text: 'text-amber-400' },
+                                    clarity: { bg: 'bg-cyan-500/10', border: 'border-cyan-500/20', text: 'text-cyan-400' }
+                                };
+                                const style = styles[key.toLowerCase()] || { bg: 'bg-slate-900/40', border: 'border-slate-800/60', text: 'text-slate-500' };
+
+                                return (
+                                    <div key={key} className={`${style.bg} border ${style.border} p-5 rounded-3xl hover:bg-opacity-20 transition-all group`}>
+                                        <span className={`text-[10px] font-bold ${style.text} uppercase tracking-widest block mb-2`}>{key}</span>
+                                        <div className="flex items-end gap-1 mb-3">
+                                            <span className="text-2xl font-black text-white leading-none">{val}</span>
+                                            <span className="text-[10px] text-slate-400 mb-0.5">/100</span>
+                                        </div>
+                                        {/* White Bar */}
+                                        <div className="h-1.5 w-full bg-slate-800/50 rounded-full overflow-hidden">
+                                            <div
+                                                className="h-full bg-white rounded-full transition-all duration-1000"
+                                                style={{ width: `${val}%` }}
+                                            />
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
 
                         {/* Summary Card */}
@@ -142,8 +242,8 @@ export default function BrainHealth() {
                                         <div>
                                             <h2 className="text-2xl font-black text-white tracking-tight">{selectedRegion}</h2>
                                             <span className={`inline-block mt-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${activeRegionData.status === 'Positive' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
-                                                    activeRegionData.status === 'Negative' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
-                                                        'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                                activeRegionData.status === 'Negative' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
+                                                    'bg-amber-500/10 text-amber-400 border border-amber-500/20'
                                                 }`}>
                                                 {activeRegionData.status} Impact Detected
                                             </span>
@@ -155,16 +255,25 @@ export default function BrainHealth() {
 
                                     <div className="space-y-4">
                                         <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-2">Analysis Breakdown</h4>
-                                        <p className="text-slate-300 leading-relaxed text-sm">
-                                            {activeRegionData.impact}
-                                        </p>
+                                        <ul className="space-y-2">
+                                            {activeRegionData.impact.split('\n').map((line, i) => (
+                                                line.trim() && (
+                                                    <li key={i} className="text-slate-300 leading-relaxed text-sm">
+                                                        {line.trim()}
+                                                    </li>
+                                                )
+                                            ))}
+                                        </ul>
                                     </div>
 
                                     {/* Related food insights for this region */}
                                     <div className="space-y-3">
                                         <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Biological Drivers</h4>
                                         <div className="space-y-2">
-                                            {report.food_insights?.filter(f => f.region_affected.includes(selectedRegion)).map((f, i) => (
+                                            {(report?.food_insights?.filter(f => f.region_affected.includes(selectedRegion))?.length
+                                                ? report.food_insights.filter(f => f.region_affected.includes(selectedRegion))
+                                                : activeRegionData?.food_insights || []
+                                            ).map((f, i) => (
                                                 <div key={i} className="p-3 bg-white/5 rounded-xl border border-white/5 text-xs text-slate-400">
                                                     <span className="text-white font-bold">{f.food}</span>: {f.benefit}
                                                 </div>

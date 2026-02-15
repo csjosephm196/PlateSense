@@ -1,174 +1,258 @@
-import { useRef, useState, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera, Text, Float, MeshDistortMaterial, Sphere } from '@react-three/drei';
-import * as THREE from 'three';
+import { useState, useMemo } from 'react';
 
-const REGIONS = [
-    { name: 'Prefrontal Cortex', position: [0, 0.5, 1.2], color: '#6366f1', description: 'Executive function & focus' },
-    { name: 'Hippocampus', position: [0, -0.2, 0], color: '#10b981', description: 'Memory & learning' },
-    { name: 'Amygdala', position: [0.4, -0.4, 0.2], color: '#f43f5e', description: 'Mood & emotion' },
-    { name: 'Occipital Lobe', position: [0, 0.2, -1.2], color: '#8b5cf6', description: 'Visual processing' },
-    { name: 'Temporal Lobe', position: [1.2, -0.2, 0.2], color: '#f59e0b', description: 'Auditory & language' },
-    { name: 'Cerebellum', position: [0, -0.8, -0.8], color: '#14b8a6', description: 'Coordination' },
-];
+// "Organic" 8-Region Model
+// ViewBox: 0 0 500 400
+// Features "wrinkly" paths to simulate gyri/sulci for a more realistic lateral view.
 
-function BrainPart({ name, position, color, onHover, score = 80 }) {
-    const mesh = useRef();
-    const [hovered, setHover] = useState(false);
+const ORGANIC_PATHS = {
+    'Prefrontal Cortex': {
+        // The very front tip, wrinkled
+        d: `M 50,220 
+            C 40,180 50,130 90,105
+            C 105,95 120,95 130,95
+            C 125,120 125,160 130,220
+            C 110,225 80,230 50,220 Z`,
+        color: '#6366f1', description: '• Focus\n• Personality',
+        zIndex: 1
+    },
+    'Frontal Lobe': {
+        // Large top-front area, behind prefrontal
+        d: `M 130,95
+            C 160,80 200,75 240,80
+            C 255,85 265,95 260,110
+            C 255,140 240,165 240,165
+            C 200,160 160,155 130,220
+            C 125,160 125,120 130,95 Z`,
+        color: '#3b82f6', description: '• Movement\n• Planning',
+        zIndex: 1
+    },
+    'Parietal Lobe': {
+        // Top-Rear - Smoothed top
+        d: `M 240,80
+            C 270,75 310,80 350,110
+            C 370,135 365,165 350,165
+            C 340,210 290,200 240,165
+            C 220,140 230,100 240,80 Z`,
+        color: '#10b981', description: '• Touch\n• Space',
+        zIndex: 1
+    },
+    'Occipital Lobe': {
+        // Extreme Rear
+        d: `M 350,110
+            C 380,130 390,170 380,200
+            C 370,220 340,230 320,225
+            C 330,200 340,180 350,165
+            C 355,155 360,130 350,110 Z`,
+        color: '#8b5cf6', description: '• Vision\n• Color',
+        zIndex: 1
+    },
+    'Temporal Lobe': {
+        // Bottom "Thumb"
+        d: `M 130,220
+            C 130,260 160,285 200,290
+            C 240,295 280,280 300,250
+            C 310,240 320,225 320,225
+            C 290,160 260,155 240,165
+            C 200,160 160,155 130,220 Z`,
+        color: '#f59e0b', description: '• Hearing\n• Memory',
+        zIndex: 0
+    },
+    'Cerebellum': {
+        // Tucked under, textured oval
+        d: `M 280,260
+            C 320,260 350,270 340,310
+            C 330,340 290,345 260,335
+            C 240,325 240,280 280,260 Z`,
+        color: '#14b8a6', description: '• Balance\n• Coordination',
+        zIndex: 0
+    },
+    'Amygdala': {
+        // Internal - modeled as overlays
+        d: `M 170,240 
+            C 165,235 170,225 180,225
+            C 190,225 195,235 190,245
+            C 185,255 175,250 170,240 Z`,
+        color: '#ef4444', description: '• Emotion\n• Fear',
+        zIndex: 2,
+        internal: true
+    },
+    'Hippocampus': {
+        // Internal - Seahorse shape extending back
+        d: `M 195,235
+            C 215,225 235,225 255,240
+            C 265,250 255,260 245,260
+            C 225,260 205,250 195,235 Z`,
+        color: '#ec4899', description: '• Memory\n• Navigation',
+        zIndex: 2,
+        internal: true
+    }
+};
 
-    // Health color logic: 
-    // score > 70: Greenish
-    // score > 40: Yellowish
-    // score <= 40: Reddish
-    const healthColor = useMemo(() => {
-        if (score > 75) return color;
-        if (score > 50) return '#fbbf24'; // Warning amber
-        return '#ef4444'; // Danger red
-    }, [score, color]);
+// Texture pattern for the "organic" look
+const OrganicTexture = () => (
+    <pattern id="gyri-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+        <path d="M5,10 Q10,5 15,10 T25,10" fill="none" stroke="rgba(0,0,0,0.1)" strokeWidth="1" />
+        <path d="M0,5 Q5,0 10,5 T20,5" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+    </pattern>
+);
 
-    useFrame((state) => {
-        const t = state.clock.getElapsedTime();
-        if (mesh.current) {
-            mesh.current.position.y = position[1] + Math.sin(t + position[0]) * 0.05;
-            // Subtle pulse if unhealthy
-            if (score < 50) {
-                const pulse = 1 + Math.sin(t * 4) * 0.05;
-                mesh.current.scale.set(pulse, pulse, pulse);
-            }
-        }
-    });
-
-    return (
-        <group
-            position={position}
-            onPointerOver={(e) => {
-                e.stopPropagation();
-                setHover(true);
-                onHover({ name, color: healthColor, score });
-            }}
-            onPointerOut={() => {
-                setHover(false);
-                onHover(null);
-            }}
-        >
-            <Sphere args={[0.35, 32, 32]} ref={mesh}>
-                <MeshDistortMaterial
-                    color={hovered ? '#ffffff' : healthColor}
-                    speed={hovered ? 5 : 2}
-                    distort={0.4}
-                    radius={1}
-                    emissive={healthColor}
-                    emissiveIntensity={hovered ? 2 : 0.5}
-                    transparent
-                    opacity={0.8}
-                />
-            </Sphere>
-            {hovered && (
-                <Text
-                    position={[0, 0.6, 0]}
-                    fontSize={0.15}
-                    color="white"
-                    anchorX="center"
-                    anchorY="middle"
-                >
-                    {name}
-                </Text>
-            )}
-        </group>
-    );
-}
-
-function BrainConnection({ start, end }) {
-    const points = useMemo(() => [new THREE.Vector3(...start), new THREE.Vector3(...end)], [start, end]);
-    const lineGeometry = useMemo(() => new THREE.BufferGeometry().setFromPoints(points), [points]);
-
-    return (
-        <line geometry={lineGeometry}>
-            <lineBasicMaterial color="#ffffff" transparent opacity={0.1} />
-        </line>
-    );
-}
+const DATA_KEY_MAPPING = {
+    'Prefrontal Cortex': 'Prefrontal Cortex',
+    'Frontal Lobe': 'Frontal Lobe',
+    'Hippocampus': 'Hippocampus',
+    'Amygdala': 'Amygdala',
+    'Occipital Lobe': 'Occipital Lobe',
+    'Temporal Lobe': 'Temporal Lobe',
+    'Cerebellum': 'Cerebellum',
+    'Parietal Lobe': 'Parietal Lobe'
+};
 
 export default function BrainModel({ data, onRegionSelect }) {
-    const [activeRegion, setActiveRegion] = useState(null);
+    const [hoveredRegion, setHoveredRegion] = useState(null);
 
-    const regionScores = useMemo(() => {
+    const regionStatus = useMemo(() => {
         if (!data?.regions) return {};
-        const scores = {};
+        const status = {};
+
         Object.entries(data.regions).forEach(([key, val]) => {
-            scores[key] = val.score;
+            const visualKey = DATA_KEY_MAPPING[key];
+            if (visualKey) status[visualKey] = { ...val, originalKey: key };
         });
-        return scores;
+
+        const defaults = [
+            'Frontal Lobe', 'Parietal Lobe', 'Prefrontal Cortex',
+            'Occipital Lobe', 'Temporal Lobe', 'Cerebellum', 'Amygdala', 'Hippocampus'
+        ];
+
+        defaults.forEach(key => {
+            if (!status[key]) status[key] = { score: 75, status: 'Neutral', originalKey: key };
+        });
+
+        return status;
     }, [data]);
 
+    const handleMouseEnter = (regionName) => {
+        setHoveredRegion(regionName);
+        if (onRegionSelect) {
+            const status = regionStatus[regionName];
+            onRegionSelect(status ? status.originalKey : regionName);
+        }
+    };
+
+    const handleMouseLeave = () => {
+        setHoveredRegion(null);
+        if (onRegionSelect) onRegionSelect(null);
+    };
+
     return (
-        <div className="w-full h-[400px] bg-slate-900 rounded-3xl overflow-hidden relative border border-slate-800 shadow-2xl">
-            <Canvas shadows>
-                <PerspectiveCamera makeDefault position={[0, 0, 4]} />
-                <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={0.5} />
+        <div className="w-full h-[400px] bg-slate-900 rounded-3xl overflow-hidden relative border border-slate-800 shadow-2xl flex items-center justify-center bg-grid-slate-800/[0.2]">
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-slate-950/50 pointer-events-none" />
 
-                <ambientLight intensity={0.5} />
-                <pointLight position={[10, 10, 10]} intensity={1} />
-                <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} intensity={1} />
+            <svg
+                viewBox="0 0 500 400"
+                className="w-full h-full max-w-[600px] drop-shadow-2xl"
+                style={{ filter: 'drop-shadow(0 0 40px rgba(99, 102, 241, 0.1))' }}
+            >
+                <defs>
+                    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="4" result="blur" />
+                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                    <OrganicTexture />
+                </defs>
 
-                <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
-                    <group>
-                        {/* Brain Core - semi-transparent shell */}
-                        <Sphere args={[1.2, 32, 32]} position={[0, 0, 0]}>
-                            <meshStandardMaterial
-                                color="#1e293b"
-                                transparent
-                                opacity={0.15}
-                                roughness={0}
-                                metalness={1}
-                            />
-                        </Sphere>
+                <g transform="translate(10, 10)">
+                    {Object.entries(ORGANIC_PATHS)
+                        .sort(([, a], [, b]) => (a.zIndex || 0) - (b.zIndex || 0))
+                        .map(([name, pathData]) => {
+                            const regionInfo = regionStatus[name];
+                            const isHovered = hoveredRegion === name;
+                            const isInternal = pathData.internal;
 
-                        {/* Regions */}
-                        {REGIONS.map((region) => (
-                            <BrainPart
-                                key={region.name}
-                                {...region}
-                                score={regionScores[region.name] || 80}
-                                onHover={(info) => {
-                                    setActiveRegion(info);
-                                    if (onRegionSelect) onRegionSelect(info ? info.name : null);
-                                }}
-                            />
-                        ))}
+                            // Determine color based on score
+                            let healthColor = '#334155'; // Default slate
+                            if (regionInfo) {
+                                if (regionInfo.score >= 80) healthColor = '#10b981';      // Green (Good)
+                                else if (regionInfo.score >= 50) healthColor = '#f59e0b'; // Amber (Average)
+                                else healthColor = '#ef4444';                             // Red (Poor)
+                            }
 
-                        {/* Neuro-connections */}
-                        {REGIONS.slice(0, -1).map((r, i) => (
-                            <BrainConnection key={i} start={r.position} end={REGIONS[i + 1].position} />
-                        ))}
-                    </group>
-                </Float>
-            </Canvas>
+                            let fillColor = healthColor;
+                            if (isHovered) fillColor = '#cbd5e1'; // Slate-300 on hover
+
+                            // Internal structures (Amygdala/Hippocampus) styling
+                            let opacity = 1;
+                            let strokeColor = '#000000'; // Always black boundaries
+                            let strokeWidth = isHovered ? 3 : 1.5;
+
+                            if (isInternal) {
+                                opacity = 0.9;
+                                strokeColor = '#000000'; // Even internal ones get black stroke for definition
+                                strokeWidth = isHovered ? 3 : 1.5;
+                            }
+
+                            return (
+                                <g key={name}
+                                    className="transition-all duration-300 ease-out cursor-pointer group"
+                                    onMouseEnter={() => handleMouseEnter(name)}
+                                    onMouseLeave={handleMouseLeave}
+                                    style={{
+                                        transformOrigin: 'center',
+                                        transform: isHovered ? 'scale(1.02)' : 'scale(1)'
+                                    }}
+                                >
+                                    {/* Base Shape */}
+                                    <path
+                                        d={pathData.d}
+                                        fill={fillColor}
+                                        stroke={strokeColor}
+                                        strokeWidth={strokeWidth}
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        fillOpacity={opacity}
+                                        style={{
+                                            filter: isHovered ? 'url(#glow)' : 'none',
+                                        }}
+                                    />
+
+                                    {/* Gyri/Sulci Texture - Apply to all except small internal ones */}
+                                    {!isInternal && (
+                                        <path
+                                            d={pathData.d}
+                                            fill="url(#gyri-pattern)"
+                                            stroke="none"
+                                            className="pointer-events-none opacity-50"
+                                            style={{ mixBlendMode: 'overlay' }}
+                                        />
+                                    )}
+                                </g>
+                            );
+                        })}
+                </g>
+            </svg>
 
             {/* Overlay UI */}
             <div className="absolute top-6 left-6 pointer-events-none">
-                <h3 className="text-white font-bold text-lg tracking-tight">Neuro-Insight 3D</h3>
-                <p className="text-slate-400 text-xs uppercase tracking-widest font-semibold mt-1">Real-time Mind Analysis</p>
+                <h3 className="text-white font-bold text-lg tracking-tight">Neuro-Insight 2D</h3>
+                <p className="text-slate-400 text-xs uppercase tracking-widest font-semibold mt-1">Anatomical Lateral View</p>
             </div>
 
-            {activeRegion && (
-                <div className="absolute bottom-6 left-6 right-6 bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl animate-in fade-in slide-in-from-bottom-2 pointer-events-none">
-                    <div className="flex justify-between items-center mb-1">
-                        <span className="text-white font-bold">{activeRegion.name}</span>
-                        <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${activeRegion.score > 70 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
-                            {activeRegion.score}% Health
-                        </span>
-                    </div>
-                    <p className="text-slate-300 text-xs">
-                        {REGIONS.find(r => r.name === activeRegion.name)?.description}
-                    </p>
+            {hoveredRegion && (
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-md border border-slate-700 px-5 py-3 rounded-2xl pointer-events-none animate-in fade-in slide-in-from-bottom-2 z-20 min-w-[200px] text-center shadow-2xl">
+                    <span className="text-white font-bold text-sm block tracking-wide">{hoveredRegion}</span>
+                    <span className="text-slate-400 text-[10px] uppercase tracking-widest block mb-1.5">{ORGANIC_PATHS[hoveredRegion].description}</span>
+                    {regionStatus[hoveredRegion] ? (
+                        <div className="inline-flex items-center justify-center gap-2">
+                            <div className={`w-2 h-2 rounded-full ${regionStatus[hoveredRegion].score > 70 ? 'bg-emerald-400' : 'bg-red-400'}`} />
+                            <span className={`text-xs font-black ${regionStatus[hoveredRegion].score > 70 ? 'text-emerald-300' : 'text-red-300'}`}>
+                                Score: {regionStatus[hoveredRegion].score}
+                            </span>
+                        </div>
+                    ) : (
+                        <span className="text-xs text-slate-500 italic">No active data</span>
+                    )}
                 </div>
             )}
-
-            {/* Tooltip for interaction */}
-            <div className="absolute top-6 right-6 px-3 py-1.5 bg-brand-purple/20 border border-brand-purple/30 rounded-full">
-                <span className="text-brand-purple text-[10px] font-bold uppercase tracking-widest">Interactive</span>
-            </div>
         </div>
     );
 }
